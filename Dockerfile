@@ -36,6 +36,7 @@ ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 USER gerrit
 ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
 ADD gerrit.config $GERRIT_CONFIG
+ADD htpasswd /home/gerrit/htpasswd
 RUN java -jar $GERRIT_WAR init --batch -d $GERRIT_HOME
 
 # Get apache is set up properly.
