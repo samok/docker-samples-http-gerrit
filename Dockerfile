@@ -46,5 +46,4 @@ RUN ln -s /etc/apache2/sites-available/001-gerrit.conf /etc/apache2/sites-enable
 # Expose ports, start everything.
 USER root
 EXPOSE 80 8080 29418
-CMD ["/usr/sbin/service","supervisor","start"]
-# CMD ["/usr/sbin/apache2" "-D", "FOREGROUND"]
+CMD ["/usr/sbin/service", "supervisor", "start"]
