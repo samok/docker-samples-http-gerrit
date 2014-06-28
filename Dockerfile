@@ -19,15 +19,17 @@ ENV GERRIT_CONFIG $GERRIT_ROOT/etc/gerrit.confg
 
 ENV SUPERVISOR_LOG_DIR /var/log/supervisor
 
-# Deal with packages.
+# Deal with packages and modules.
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-6-jre supervisor vim apache2
+RUN a2enmod rewrite proxy
 
 # Create users and directories
 RUN useradd -m $GERRIT_USER
 RUN mkdir -p $GERRIT_ROOT
 RUN mkdir -p $SUPERVISOR_LOG_DIR
+RUN mkdir -p /var/lock/apache2
 
 # Copy over all sorts of root-owned files.
 ADD htpasswd $GERRIT_HOME/htpasswd
