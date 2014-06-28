@@ -27,22 +27,30 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-6-jre supervisor v
 # Create users and directories
 RUN useradd -m $GERRIT_USER
 RUN mkdir -p $GERRIT_ROOT
-RUN chown -R ${GERRIT_USER}:${GERRIT_USER} $GERRIT_HOME
 RUN mkdir -p $SUPERVISOR_LOG_DIR
 
 # Copy over all sorts of root-owned files.
+ADD htpasswd $GERRIT_HOME/htpasswd
+ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
 ADD 001-gerrit.conf /etc/apache2/sites-available/
 RUN ln -s /etc/apache2/sites-available/001-gerrit.conf /etc/apache2/sites-enabled/
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Configure gerrit..
-USER gerrit
-ADD htpasswd $GERRIT_HOME/htpasswd
-ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
-RUN java -jar $GERRIT_WAR init --batch -d $GERRIT_ROOT
-ADD gerrit.config $GERRIT_CONFIG  # Add the config overtop of whatever is generated.
+# Make sure gerrit owns all of his stuff.
+RUN chown -R ${GERRIT_USER}:${GERRIT_USER} $GERRIT_HOME
 
-# Expose ports, start everything.
+# Configure gerrit.
+USER gerrit
+RUN ls -l $GERRIT_HOME
+RUN java -jar $GERRIT_WAR init --batch -d $GERRIT_ROOT
+
+# Jump back to root.
 USER root
+
+# Add the config file overtop of whatever is generated (and fix ownership).
+ADD gerrit.config $GERRIT_CONFIG
+RUN chown ${GERRIT_USER}:${GERRIT_USER} $GERRIT_CONFIG
+
+# Expose ports and start everything.
 EXPOSE 80 29418
 CMD ["/usr/sbin/service", "supervisor", "start"]
