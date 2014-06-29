@@ -34,30 +34,30 @@ RUN mkdir -p $GERRIT_ROOT
 RUN mkdir -p $SUPERVISOR_LOG_DIR
 RUN mkdir -p /var/lock/apache2
 
-# Copy over all sorts of root-owned files.
-RUN ln -s /data/htpasswd $GERRIT_HOME/htpasswd
-
+# Pull down the gerrit package.
 ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
 
+# Configure Apache.
 RUN rm /etc/apache2/sites-enabled/*
 RUN ln -s /data/000-gerrit.conf /etc/apache2/sites-enabled/
-
+RUN ln -s /data/htpasswd $GERRIT_HOME/htpasswd
 RUN echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
 RUN sudo ln -s /etc/apache2/conf-available/fqdn.conf /etc/apache2/conf-enabled/fqdn.conf
 
+# Configure supervisor.
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Make sure gerrit owns all of his stuff.
 RUN chown -R ${GERRIT_USER}:${GERRIT_USER} $GERRIT_HOME
 
-# Configure gerrit.
+# Configure gerrit (as gerrit).
 USER gerrit
 RUN java -jar $GERRIT_WAR init --batch -d $GERRIT_ROOT --no-auto-start
 
 # Jump back to root.
 USER root
 
-# Add the config file overtop of whatever is generated (and fix ownership).
+# Add gerrit configurations overtop of whatever is generated (and fix ownership).
 RUN rm -f $GERRIT_ROOT/etc/gerrit.config
 RUN rm -f $GERRIT_ROOT/etc/secure.config
 RUN rm -rf $GERRIT_ROOT/git/
