@@ -3,8 +3,18 @@ Docker + Gerrit
 
 This will run Gerrit behind HTTP simple auth using Apache2.
 
-Configuration
-=============
+How to use this...
+==================
+
+Clone the repository
+--------------------
+
+```bash
+$ git clone https://github.com/jgeewax/docker-gerrit.git
+```
+
+Configure things for your environment
+-------------------------------------
 
 1. Edit your gerrit configuration files in the `gerrit` directory.
    Anything in this directory will be copied over at build time.
@@ -15,18 +25,16 @@ Configuration
 Note: Your git repositories will be stored in `git/` (which is mounted as
 a writable volume on the container.
 
-Running as a daemon
-===================
+Build the image
+---------------------
 
 ```bash
-./run-daemon
+$ docker build -t <username>/gerrit .
 ```
 
-Building from scratch
-=====================
+Run the container as a daemon
+-----------------------------
 
 ```bash
-git clone https://github.com/jgeewax/docker-gerrit.git
-cd docker-gerrit
-docker build -t jgeewax/gerrit .
+$ ./run-daemon
 ```
