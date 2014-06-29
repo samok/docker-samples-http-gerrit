@@ -35,9 +35,7 @@ RUN mkdir -p $SUPERVISOR_LOG_DIR
 RUN mkdir -p /var/lock/apache2
 
 # Copy over all sorts of root-owned files.
-#ADD htpasswd $GERRIT_HOME/htpasswd
 RUN ln -s /data/htpasswd $GERRIT_HOME/htpasswd
-#RUN chmod a+r $GERRIT_HOME/htpasswd
 
 ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
 
