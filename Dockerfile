@@ -70,5 +70,5 @@ RUN ln -s /usr/share/java/mysql.jar /home/gerrit/gerrit/lib/mysql.jar
 RUN chown -R ${GERRIT_USER}:${GERRIT_USER} $GERRIT_HOME
 
 # Expose ports and start everything.
-EXPOSE 8080 80 29418
+EXPOSE 80 29418
 CMD ["/usr/sbin/service", "supervisor", "start"]
