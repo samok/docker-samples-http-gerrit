@@ -16,8 +16,6 @@ ENV GERRIT_USER gerrit
 ENV GERRIT_HOME /home/gerrit
 ENV GERRIT_ROOT $GERRIT_HOME/gerrit
 ENV GERRIT_WAR $GERRIT_HOME/gerrit.war
-#ENV GERRIT_CONFIG $GERRIT_ROOT/etc/gerrit.config
-#ENV GERRIT_SECURE_CONFIG $GERRIT_ROOT/etc/secure.config
 
 # Supervisor environment variables.
 ENV SUPERVISOR_LOG_DIR /var/log/supervisor
