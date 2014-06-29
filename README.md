@@ -6,22 +6,14 @@ This will run Gerrit behind HTTP simple auth using Apache2.
 Configuration
 =============
 
-There are three volumes that need to be mounted for this image:
+1. Edit your gerrit configuration files in the `gerrit` directory.
+   Anything in this directory will be copied over at build time.
 
-1. `gerrit/` (read only)
-   
-    This volume holds your gerrit configuration files (hooks, etc, plugins, ...).
+2. Edit your apache configuration files in the `apache` directory.
+   htpasswd and gerrit.conf will be moved into `/etc/apache2`.
 
-2. `apache/` (read only)
-
-   This volume holds your apache2 configuration files (htpasswd, gerrit.conf).
-
-3. `git/`
-
-   This volume holds your git repositories (All-Projects.git, etc)
-
-Update all the configuration files (add any other files you want) and you
-should be good to go.
+Note: Your git repositories will be stored in `git/` (which is mounted as
+a writable volume on the container.
 
 Running as a daemon
 ===================

@@ -2,7 +2,5 @@
 docker run \
   -p 0.0.0.0:80:80 \
   -p 0.0.0.0:29418:29418 \
-  -v `pwd`/gerrit:/gerrit:ro \
-  -v `pwd`/apache:/apache:ro \
   -v `pwd`/git:/git \
   -ti jgeewax/gerrit /bin/bash
