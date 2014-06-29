@@ -35,14 +35,12 @@ RUN mkdir -p $SUPERVISOR_LOG_DIR
 RUN mkdir -p /var/lock/apache2
 
 # Copy over all sorts of root-owned files.
-#ADD htpasswd $GERRIT_HOME/htpasswd
-RUN ln -s /data/htpasswd $GERRIT_HOME/htpasswd
-#RUN chmod a+r $GERRIT_HOME/htpasswd
+RUN ln -s /gerrit/htpasswd $GERRIT_HOME/htpasswd
 
 ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
 
 RUN rm /etc/apache2/sites-enabled/*
-RUN ln -s /data/000-gerrit.conf /etc/apache2/sites-enabled/
+RUN ln -s /gerrit/000-gerrit.conf /etc/apache2/sites-enabled/
 
 RUN echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
 RUN sudo ln -s /etc/apache2/conf-available/fqdn.conf /etc/apache2/conf-enabled/fqdn.conf
@@ -60,15 +58,16 @@ RUN java -jar $GERRIT_WAR init --batch -d $GERRIT_ROOT --no-auto-start
 USER root
 
 # Add the config file overtop of whatever is generated (and fix ownership).
-RUN rm -f $GERRIT_ROOT/etc/gerrit.config
-RUN rm -f $GERRIT_ROOT/etc/secure.config
-RUN rm -rf $GERRIT_ROOT/git/
-RUN ln -s /data/gerrit.config $GERRIT_ROOT/etc/gerrit.config
-RUN ln -s /data/secure.config $GERRIT_ROOT/etc/secure.config
-RUN ln -s /git $GERRIT_ROOT/git
+RUN rm -rf $GERRIT_ROOT/etc $GERRIT_ROOT/hooks $GERRIT_ROOT/plugins $GERRIT_ROOT/static
+RUN ln -sf /gerrit/etc $GERRIT_ROOT/etc
+RUN ln -sf /gerrit/hooks $GERRIT_ROOT/hooks
+RUN ln -sf /gerrit/plugins $GERRIT_ROOT/plugins
+RUN ln -sf /gerrit/static $GERRIT_ROOT/static
+RUN ln -sf /git $GERRIT_ROOT/git
 RUN ln -s /usr/share/java/mysql.jar /home/gerrit/gerrit/lib/mysql.jar
+
 RUN chown -R ${GERRIT_USER}:${GERRIT_USER} $GERRIT_HOME
 
 # Expose ports and start everything.
-EXPOSE 8080 80 29418
+EXPOSE 80 29418
 CMD ["/usr/sbin/service", "supervisor", "start"]
