@@ -37,8 +37,8 @@ ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
 
 # Configure Apache.
 RUN rm /etc/apache2/sites-enabled/*
-RUN ln -s /gerrit/htpasswd $GERRIT_HOME/htpasswd
-RUN ln -s /gerrit/000-gerrit.conf /etc/apache2/sites-enabled/
+RUN ln -s /apache/htpasswd $GERRIT_HOME/htpasswd
+RUN ln -s /apache/gerrit.conf /etc/apache2/sites-enabled/000-gerrit.conf
 RUN echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
 RUN sudo ln -s /etc/apache2/conf-available/fqdn.conf /etc/apache2/conf-enabled/fqdn.conf
 
