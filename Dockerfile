@@ -22,8 +22,14 @@ ENV SUPERVISOR_LOG_DIR /var/log/supervisor
 
 # Deal with packages and modules.
 RUN apt-get update
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository ppa:openjdk-r/ppa
+RUN apt-get update
 RUN apt-get upgrade -y
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-6-jre supervisor git apache2 libmysql-java vim
+CMD /bin/bash debconf-set-selections <<< "postfix postfix/mailname string localhost"
+CMD /bin/bash debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y openjdk-8-jre supervisor git apache2 vim mailutils
+#libmysql-java
 RUN a2enmod rewrite proxy proxy_http
 
 # Create users and directories
@@ -33,14 +39,14 @@ RUN mkdir -p $SUPERVISOR_LOG_DIR
 RUN mkdir -p /var/lock/apache2
 
 # Pull down the gerrit package.
-ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.7.war $GERRIT_WAR
+ADD http://gerrit-releases.storage.googleapis.com/gerrit-2.16.war $GERRIT_WAR
 
 # Configure Apache.
 RUN rm /etc/apache2/sites-enabled/*
 ADD apache/htpasswd /etc/apache2/htpasswd
 ADD apache/gerrit.conf /etc/apache2/sites-available/gerrit.conf
 RUN ln -s /etc/apache2/sites-available/gerrit.conf /etc/apache2/sites-enabled/000-gerrit.conf
-RUN echo "ServerName localhost" | tee /etc/apache2/conf-available/fqdn.conf
+RUN echo "ServerName chromebox.samok.fr" | tee /etc/apache2/conf-available/fqdn.conf
 RUN sudo ln -s /etc/apache2/conf-available/fqdn.conf /etc/apache2/conf-enabled/fqdn.conf
 
 # Configure supervisor.
@@ -60,10 +66,10 @@ USER root
 ADD gerrit/ /tmp/gerrit
 RUN cp -R /tmp/gerrit/* $GERRIT_ROOT
 RUN ln -sf /git $GERRIT_ROOT/git
-RUN ln -s /usr/share/java/mysql.jar /home/gerrit/gerrit/lib/mysql.jar
+#RUN ln -s /usr/share/java/mysql.jar /home/gerrit/gerrit/lib/mysql.jar
 
 RUN chown -R ${GERRIT_USER}:${GERRIT_USER} $GERRIT_HOME
 
 # Expose ports and start everything.
-EXPOSE 80 29418 8080
+EXPOSE 80 29418 8080 25
 CMD ["/usr/sbin/service", "supervisor", "start"]
